@@ -1,5 +1,5 @@
 {
-  "name": "scout-door-hangers",
+  "name": "door-hanger-map",
   "private": true,
   "type": "module",
   "description": "Shared live map for a scout troop's door-hanger day",

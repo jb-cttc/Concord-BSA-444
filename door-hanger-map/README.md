@@ -10,11 +10,8 @@ they are walked. At the end, the **Streets left** list shows anything missed.
 No App Store, no accounts, no cost. It is a web page that phones open in
 Safari or Chrome, and it can be added to the home screen like an app.
 
-> **Temporary home.** This folder lives in the Concord Table Tennis Club repo
-> only while the idea is sketched out. It has nothing to do with the club. Move
-> it to its own repository before using it (see *Hosting*). **Do not merge it
-> into the club's `main` branch.** That branch is the club website, so the app
-> would go live at `concordtabletennisclub.com/scout-door-hangers/`.
+Status and the plan for what comes next are in the
+[repository README](../README.md).
 
 ## How the day works
 
@@ -91,13 +88,13 @@ once, so about 15 MB in total. That is well under 1% of the free allowance.
 
 ### Setting it up (about 20 minutes, once)
 
-Use a Google account that belongs to the troop (or to you), **not** the table
-tennis club's account.
+Use a Google account that belongs to the troop (or to you).
 
-1. **Own repository:** make a new GitHub repository (e.g. `troop-door-hangers`).
-   Copy this folder's files to its root. Under Settings > Pages, choose
-   *Deploy from a branch*, `main`, `/ (root)`. The site appears at
-   `https://<you>.github.io/troop-door-hangers/`.
+1. **Web page:** in this repository's Settings > Pages, choose *Deploy from a
+   branch*, `main`, `/ (root)`. The app then appears at
+   `https://jb-cttc.github.io/Concord-BSA-444/door-hanger-map/` (Settings >
+   Pages shows the exact address). GitHub Pages needs a public repository on
+   a free account.
 2. **Firebase project:** at <https://console.firebase.google.com> create a
    project (Google Analytics not needed).
 3. **Anonymous sign-in:** Build > Authentication > Get started > Sign-in method
@@ -129,7 +126,7 @@ With `FIREBASE_CONFIG = null` in `config.js`, the app runs in demo mode. Data
 stays in that one browser, though it is shared between its tabs.
 
 ```sh
-cd scout-door-hangers
+cd door-hanger-map
 python3 -m http.server 8080     # then open http://localhost:8080
 node check-coverage.js          # coverage math checks
 ```
@@ -181,16 +178,7 @@ Gate Area Council and Scouting America. Using them inside the troop's own app
 is ordinary unit use. Check with the council before putting the logo on
 anything sold or published more widely.
 
-## Not built yet (ideas)
+## What's next
 
-- **Assign streets to groups before the day,** shown in each group's colour, so
-  each group can see its own list.
-- **Both sides of the street:** a wide street may need one pass per side. Right
-  now one pass counts for both.
-- **House-level view:** OpenStreetMap has address points for some
-  neighbourhoods. Where it does, the app could show houses rather than streets.
-- **End-of-day export:** a picture or GPX file of the final map for the troop's
-  records, and automatic deletion of event data after a set time.
-- **Tested on real phones with Firebase:** demo mode and the coverage maths are
-  tested. The Firebase connection is written but has not yet run against a real
-  project.
+See [Plan](../README.md#plan) in the repository README: street and area
+assignments for groups, then counting the parcels each person touches.
