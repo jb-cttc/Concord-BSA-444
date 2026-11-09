@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>BSA Troop 444</title>
+  <meta name="description" content="Troop 444's live shared map for door-hanger days.">
+  <meta name="theme-color" content="#3e5383">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Troop 444">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="brand/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="map" aria-label="Map"></div>
+
+  <div id="top">
+  <header id="topbar">
+    <img id="topLogo" src="brand/logo-600.png" alt="">
+    <div class="grow">
+      <div id="eventName">BSA Troop 444</div>
+      <div id="summary" class="muted"></div>
+    </div>
+    <button id="menuBtn" class="ghost" aria-label="Open menu">Menu</button>
+  </header>
+
+  <div id="banner" hidden></div>
+
+  <div id="areaBar" hidden>
+    <span>Tap the corners of the area.</span>
+    <button id="areaUndo" class="ghost">Undo</button>
+    <button id="areaCancel" class="ghost">Cancel</button>
+    <button id="areaDone">Get streets</button>
+  </div>
+  </div>
+
+  <footer id="bottombar">
+    <div id="gps" class="muted"></div>
+    <button id="trackBtn" class="big">Start door hangers</button>
+  </footer>
+
+  <section id="join" class="sheet open" hidden>
+    <img id="joinLogo" src="brand/logo-600.png" alt="Golden Gate Area Council patch with Troop 444 numerals">
+    <h1>BSA Troop 444</h1>
+    <p class="lead">Door hanger map</p>
+    <p class="muted">Everyone's position and trail show on one shared map, and the streets turn green as they're covered.</p>
+    <label>Event code <input id="joinCode" autocomplete="off" autocapitalize="off" placeholder="from the organizer's link"></label>
+    <label>Your name <input id="joinName" autocomplete="given-name" placeholder="e.g. Mr. Lee"></label>
+    <label>Group <select id="joinGroup"></select></label>
+    <button id="joinBtn" class="big">Join event</button>
+    <details>
+      <summary>Organizer: start a new event</summary>
+      <label>Event name <input id="createName" placeholder="Troop 444 door hangers"></label>
+      <button id="createBtn">Create event</button>
+    </details>
+    <p id="joinError" class="error" hidden></p>
+    <p id="modeNote" class="muted small"></p>
+  </section>
+
+  <section id="menu" class="sheet" hidden>
+    <div class="tabs" role="tablist">
+      <button data-tab="people" class="active">People</button>
+      <button data-tab="streets">Streets left</button>
+      <button data-tab="event">Event</button>
+      <button id="menuClose" class="ghost" aria-label="Close menu">Close</button>
+    </div>
+    <div id="tab-people" class="tab"></div>
+    <div id="tab-streets" class="tab" hidden></div>
+    <div id="tab-event" class="tab" hidden>
+      <h2>Share with the other adults</h2>
+      <p class="muted">Send this link or let them scan the code. Anyone with the link can see the map.</p>
+      <div class="row"><input id="shareLink" readonly><button id="shareBtn">Share</button></div>
+      <div id="qr"></div>
+      <div id="ownerTools" hidden>
+        <h2>Organizer</h2>
+        <button id="setAreaBtn">Set area and get streets</button>
+        <button id="simBtn" hidden>Simulate 3 walkers (demo)</button>
+        <button id="deleteBtn" class="danger">Delete all event data</button>
+        <p class="muted small">Delete when the day is done: it removes everyone's tracks for good.</p>
+      </div>
+      <h2>You</h2>
+      <p id="youLine" class="muted"></p>
+      <button id="leaveBtn" class="ghost">Change name or group</button>
+    </div>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
