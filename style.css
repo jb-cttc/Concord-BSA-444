@@ -3,7 +3,7 @@
   --fg: #1d2420;
   --muted: #5d6b62;
   --line: #d6ddd8;
-  --accent: #1f5130;
+  --accent: #2c4475;
   --accent-fg: #ffffff;
   --danger: #b3261e;
   --panel: rgba(255, 255, 255, 0.96);
@@ -14,15 +14,15 @@
     --fg: #e8ede9;
     --muted: #a3b0a7;
     --line: #34403a;
-    --accent: #5fbf7f;
-    --accent-fg: #0b1a10;
+    --accent: #9db8ee;
+    --accent-fg: #0f1a2e;
     --danger: #ff8a80;
     --panel: rgba(20, 24, 22, 0.96);
   }
 }
 :root[data-theme="dark"] {
   --bg: #141816; --fg: #e8ede9; --muted: #a3b0a7; --line: #34403a;
-  --accent: #5fbf7f; --accent-fg: #0b1a10; --danger: #ff8a80; --panel: rgba(20, 24, 22, 0.96);
+  --accent: #9db8ee; --accent-fg: #0f1a2e; --danger: #ff8a80; --panel: rgba(20, 24, 22, 0.96);
 }
 
 * { box-sizing: border-box; }
@@ -70,9 +70,14 @@ h2 { margin: 20px 0 6px; font-size: 17px; }
 .leaflet-bottom { bottom: calc(96px + env(safe-area-inset-bottom)); }
 #topbar {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  padding: 8px 8px 8px 14px;
+  padding: 6px 8px 6px 8px;
 }
 #eventName { font-weight: 700; }
+#topLogo { height: 40px; width: auto; flex: none; }
+#topbar .grow { flex: 1; min-width: 0; }
+#joinLogo { display: block; width: min(260px, 70%); height: auto; margin: 8px auto 12px; }
+#join h1 { text-align: center; }
+.lead { text-align: center; margin: 0 0 10px; font-weight: 600; color: var(--muted); }
 #summary { font-size: 14px; }
 #banner {
   padding: 10px 14px; font-size: 14px;

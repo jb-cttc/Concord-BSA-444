@@ -1,6 +1,8 @@
-# Door Hanger Map
+# BSA Troop 444: door hanger map
 
-A small web app for a scout troop's door-hanger day. Each adult opens one link
+<img src="brand/logo-600.png" alt="Golden Gate Area Council patch with Troop 444 numerals" width="300">
+
+A small web app for Troop 444's door-hanger days. Each adult opens one link
 on their phone and taps **Start door hangers**. Everyone's dot and trail show on
 one shared map, and the streets in the assigned area turn from grey to green as
 they are walked. At the end, the **Streets left** list shows anything missed.
@@ -147,7 +149,37 @@ fake adults then walk it. Open the event link in a second tab and press
 | `store.js` | Shared data: `FirebaseStore` (live) and `LocalStore` (demo) |
 | `config.js` | Firebase settings, or `null` for demo mode |
 | `firebase-rules.json` | Database security rules to paste into Firebase |
-| `manifest.webmanifest`, `icon.svg` | Add to Home Screen name and icon |
+| `manifest.webmanifest`, `icon-*.png`, `apple-touch-icon.png` | Add to Home Screen name and icons |
+| `brand/` | The troop logo (see below) |
+
+## The logo
+
+`brand/logo.svg` is the troop's uniform patches, digitized from a photo of a
+sleeve: the Golden Gate Area Council shoulder patch with the red 444 unit
+numerals below it. It is a vector drawing, so it stays sharp at any size.
+
+| File | Use |
+| --- | --- |
+| `brand/logo.svg` | Master copy, transparent background, any size |
+| `brand/logo-2400.png`, `brand/logo-600.png` | Ready-made PNGs (transparent) for print, slides, chat |
+| `brand/icon.svg` | Square app icon on uniform blue |
+| `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` | Home-screen icons (iPhones need the PNG) |
+
+To change it, edit `brand/make-logo.py` (colours are at the top), then rebuild:
+
+```sh
+pip install fonttools
+# Nunito Black: from github.com/google/fonts (ofl/nunito), set to weight 900:
+python3 -m fontTools.varLib.instancer 'Nunito[wght].ttf' wght=900 -o nunito900.ttf
+python3 brand/make-logo.py nunito900.ttf brand
+node brand/render-png.cjs        # needs Playwright
+```
+
+The lettering is Nunito Black (SIL Open Font License), converted to outlines.
+The council patch design and the Scouting fleur-de-lis belong to the Golden
+Gate Area Council and Scouting America. Using them inside the troop's own app
+is ordinary unit use. Check with the council before putting the logo on
+anything sold or published more widely.
 
 ## Not built yet (ideas)
 

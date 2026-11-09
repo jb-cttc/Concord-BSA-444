@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Door Hanger Map</title>
-  <meta name="description" content="Live shared map for a scout troop's door-hanger day.">
-  <meta name="theme-color" content="#1f5130">
+  <title>BSA Troop 444</title>
+  <meta name="description" content="Troop 444's live shared map for door-hanger days.">
+  <meta name="theme-color" content="#3e5383">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Door Hangers">
+  <meta name="apple-mobile-web-app-title" content="Troop 444">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="icon" href="brand/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -19,8 +20,9 @@
 
   <div id="top">
   <header id="topbar">
-    <div>
-      <div id="eventName">Door Hanger Map</div>
+    <img id="topLogo" src="brand/logo-600.png" alt="">
+    <div class="grow">
+      <div id="eventName">BSA Troop 444</div>
       <div id="summary" class="muted"></div>
     </div>
     <button id="menuBtn" class="ghost" aria-label="Open menu">Menu</button>
@@ -42,7 +44,9 @@
   </footer>
 
   <section id="join" class="sheet open" hidden>
-    <h1>Door Hanger Map</h1>
+    <img id="joinLogo" src="brand/logo-600.png" alt="Golden Gate Area Council patch with Troop 444 numerals">
+    <h1>BSA Troop 444</h1>
+    <p class="lead">Door hanger map</p>
     <p class="muted">Everyone's position and trail show on one shared map, and the streets turn green as they're covered.</p>
     <label>Event code <input id="joinCode" autocomplete="off" autocapitalize="off" placeholder="from the organizer's link"></label>
     <label>Your name <input id="joinName" autocomplete="given-name" placeholder="e.g. Mr. Lee"></label>
@@ -50,7 +54,7 @@
     <button id="joinBtn" class="big">Join event</button>
     <details>
       <summary>Organizer: start a new event</summary>
-      <label>Event name <input id="createName" placeholder="Troop 123 door hangers"></label>
+      <label>Event name <input id="createName" placeholder="Troop 444 door hangers"></label>
       <button id="createBtn">Create event</button>
     </details>
     <p id="joinError" class="error" hidden></p>

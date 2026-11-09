@@ -470,7 +470,7 @@ function shareLink() { return `${location.origin}${location.pathname}?e=${encode
 $('shareBtn').onclick = async () => {
   const url = shareLink();
   try {
-    if (navigator.share) await navigator.share({ title: S.meta ? S.meta.name : 'Door hangers', url });
+    if (navigator.share) await navigator.share({ title: S.meta ? S.meta.name : 'BSA Troop 444', url });
     else { await navigator.clipboard.writeText(url); banner('Link copied.', 3000); }
   } catch { /* cancelled */ }
 };
@@ -519,7 +519,7 @@ $('joinBtn').onclick = () => {
 $('createBtn').onclick = () => {
   joinError('');
   const me = readMe();
-  if (me) enter(newEventCode(), me, $('createName').value.trim() || 'Door hangers');
+  if (me) enter(newEventCode(), me, $('createName').value.trim() || 'Troop 444 door hangers');
 };
 $('leaveBtn').onclick = () => {
   if (S.tracking) stopTracking();
@@ -534,8 +534,8 @@ const handlers = {
       return;
     }
     if ($('banner').textContent.startsWith('No event found')) banner('');
-    $('eventName').textContent = m.name || 'Door hangers';
-    document.title = m.name || 'Door Hanger Map';
+    $('eventName').textContent = m.name || 'Troop 444 door hangers';
+    document.title = m.name || 'BSA Troop 444';
     S.isOwner = m.owner === S.uid;
     $('ownerTools').hidden = !S.isOwner;
     $('simBtn').hidden = store.kind !== 'demo';
