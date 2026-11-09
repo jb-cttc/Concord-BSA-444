@@ -8,7 +8,7 @@ own folder and runs as a plain web page, with no App Store and no build step.
 
 | App | What it is | Status |
 | --- | --- | --- |
-| [`door-hanger-map/`](door-hanger-map/) | Live shared map for door-hanger days: everyone's dot and trail, with streets turning green as they are covered | Working prototype in demo mode. Not yet connected to a live database or tried on real phones. |
+| [`door-hanger-map/`](door-hanger-map/) | Live shared map for door-hanger days: everyone's dot and trail, with streets turning green as they are covered | Working prototype in demo mode, with a one-minute guided demo for showing people. Not yet connected to a live database or tried on real phones. |
 
 ## Door hanger map: where it stands
 
@@ -25,10 +25,16 @@ own folder and runs as a plain web page, with no App Store and no build step.
   be marked done by hand.
 - **Organizer tools:** share link and QR code, delete all event data, and a
   three-walker simulation for demos.
+- **Guided demo for showing people:** add `?demo` to the address. Four
+  pretend adults walk a pretend neighbourhood in about a minute, with one
+  missed street and one locked phone, so **Streets left** has something to
+  show. Nothing is saved. See
+  [the demo](door-hanger-map/README.md#showing-it-to-people-the-one-minute-demo).
 - **Troop 444 branding:** a logo digitized from the uniform patches, plus
   home-screen icons.
-- **Tests:** checks for the coverage maths (`node check-coverage.js`), plus
-  end-to-end runs in a headless browser with simulated GPS and two tabs.
+- **Tests:** checks for the coverage maths (`node check-coverage.js`) and the
+  guided demo (`node check-demo.js`), plus end-to-end runs in a headless
+  browser with simulated GPS and two tabs.
 
 **Before the first real use** (owner steps, about 20 minutes; see
 [Setting it up](door-hanger-map/README.md#setting-it-up-about-20-minutes-once)):
@@ -50,6 +56,15 @@ own folder and runs as a plain web page, with no App Store and no build step.
 - GPS is accurate to roughly 5–15 m.
 
 ## Plan
+
+### 0. Gather feedback (now)
+
+Show the concept to the troop's adults before building more. A concept page
+(a private claude.ai page the owner shares) has the live demo, how the day
+works, sketches of the two planned features below, and a short feedback form.
+People with access to the page can save answers there; anyone else can copy
+their answers and text them back. Before building Plan 1, read what came back
+and adjust the plan.
 
 ### 1. Group assignments (next)
 
@@ -153,7 +168,9 @@ has to tap anything.
    `cd door-hanger-map && python3 -m http.server 8080`, open
    `http://localhost:8080`, create an event, then Event tab > **Simulate 3
    walkers**.
-3. Run the checks: `cd door-hanger-map && node check-coverage.js`.
+3. Run the checks: `cd door-hanger-map && npm test` (no installs needed).
+   The quickest look at the whole app is the guided demo:
+   `http://localhost:8080/?demo`.
 4. Start on **Plan 1, group assignments**, on a new branch, with a pull
    request into `main`.
 

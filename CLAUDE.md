@@ -12,13 +12,15 @@ on their own phones. Start with `README.md`, which has the status and the plan.
 - GitHub Pages serves `main` from the repository root, so whatever is merged
   into `main` is live. Work on a branch and open a pull request.
 - Keep maths and logic out of browser code where possible (`coverage.js`), so
-  it can be tested with Node: `node check-coverage.js`.
+  it can be tested with Node: `node check-coverage.js` and
+  `node check-demo.js` (or `npm test` in the app folder).
 - Before calling a change done:
   - Run the checks.
   - Try the app in demo mode in a browser at phone width (390 px) and at a
     wide width, in light and dark mode.
   - With Playwright, block `tile.openstreetmap.org` and fake the Overpass
-    response; the walker simulation drives the rest.
+    response; the walker simulation drives the rest. The guided demo
+    (`?demo`) needs neither, so it is the quickest end-to-end run.
 
 ## Data and privacy
 

@@ -5,6 +5,8 @@
 //   LocalStore    - demo mode when config.js has no Firebase settings. Data
 //                   lives in this browser only (shared between tabs), which is
 //                   enough to try the app and run the walker simulation.
+//                   With { memory: true } (the guided demo) nothing is saved
+//                   at all: it is gone when the page closes.
 //
 // Data layout (same in both):
 //   events/{code}/meta              { name, owner, createdAt, area, streets }
@@ -32,15 +34,17 @@ function safeRemove(key) {
 }
 
 export class LocalStore {
-  constructor() { this.kind = 'demo'; this.seq = 0; }
+  constructor({ memory = false } = {}) { this.kind = 'demo'; this.seq = 0; this.memory = memory; }
 
   async init() {
+    if (this.memory) return (this.uid = randomId());
     this.uid = safeGet('sdh:uid') || randomId();
     safeSet('sdh:uid', this.uid);
     return this.uid;
   }
 
   load(code) {
+    if (this.memory) return { meta: null, people: {}, tracks: {}, done: {} };
     try {
       const s = JSON.parse(safeGet('sdh:event:' + code));
       if (s) return s;
@@ -49,6 +53,7 @@ export class LocalStore {
   }
 
   save(code, s) {
+    if (this.memory) return;
     if (!safeSet('sdh:event:' + code, JSON.stringify(s))) console.warn('Demo storage full or blocked');
   }
 
@@ -63,7 +68,7 @@ export class LocalStore {
       for (const [key, pt] of Object.entries(pts)) h.point(uid, key, pt);
     }
     for (const [wayId, v] of Object.entries(s.done)) h.done(wayId, v);
-    if ('BroadcastChannel' in window) {
+    if (!this.memory && 'BroadcastChannel' in window) {
       this.chan = new BroadcastChannel('sdh:' + code);
       this.chan.onmessage = (e) => this.apply(e.data, false);
     }

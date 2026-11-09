@@ -7,6 +7,9 @@
   --accent-fg: #ffffff;
   --danger: #b3261e;
   --panel: rgba(255, 255, 255, 0.96);
+  --land: #eef0ec;
+  --house: #cdd3cc;
+  --label: #4c5852;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -18,11 +21,15 @@
     --accent-fg: #0f1a2e;
     --danger: #ff8a80;
     --panel: rgba(20, 24, 22, 0.96);
+    --land: #1b201d;
+    --house: #39433d;
+    --label: #b4c0b8;
   }
 }
 :root[data-theme="dark"] {
   --bg: #141816; --fg: #e8ede9; --muted: #a3b0a7; --line: #34403a;
   --accent: #9db8ee; --accent-fg: #0f1a2e; --danger: #ff8a80; --panel: rgba(20, 24, 22, 0.96);
+  --land: #1b201d; --house: #39433d; --label: #b4c0b8;
 }
 
 * { box-sizing: border-box; }
@@ -134,3 +141,18 @@ details summary { cursor: pointer; color: var(--muted); }
 }
 .who-label::before { display: none; }
 .leaflet-popup-content button { margin-top: 6px; }
+.leaflet-container .leaflet-control-attribution { background: var(--panel); color: var(--muted); }
+.leaflet-control-attribution a { color: var(--accent); }
+
+/* Guided demo: no map tiles, a pretend neighbourhood drawn by the app */
+.tour .leaflet-container { background: var(--land); }
+.street-label {
+  background: transparent; border: 0; box-shadow: none; padding: 0;
+  color: var(--label); font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+  text-shadow: 0 0 3px var(--land), 0 0 3px var(--land), 0 0 2px var(--land);
+}
+.street-label.vertical { writing-mode: vertical-rl; }
+.street-label::before { display: none; }
+.labels-off .street-label { display: none; }
+.demo-cta { text-align: center; margin: 4px 0 8px; }
+.demo-cta a { color: var(--accent); font-weight: 600; }

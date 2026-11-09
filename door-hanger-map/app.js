@@ -1,6 +1,7 @@
 import { FIREBASE_CONFIG } from './config.js';
 import { LocalStore, FirebaseStore, newEventCode } from './store.js';
 import { Coverage, decodePath, encodePath, distM, makeProjector, overpassQuery, parseOverpass } from './coverage.js';
+import { makeTour } from './demo.js';
 
 const GROUPS = [
   ['Red', '#d93025'], ['Blue', '#1a73e8'], ['Gold', '#b58900'], ['Orange', '#e8710a'],
@@ -23,7 +24,12 @@ const prefs = {
   get(k) { try { return JSON.parse(localStorage.getItem('sdh:' + k)); } catch { return null; } },
   set(k, v) { try { localStorage.setItem('sdh:' + k, JSON.stringify(v)); } catch { /* private mode */ } },
 };
-const store = FIREBASE_CONFIG ? new FirebaseStore(FIREBASE_CONFIG) : new LocalStore();
+const params = new URLSearchParams(location.search);
+// Guided demo: pretend people on a pretend neighbourhood. Kept in memory
+// only, so it never touches a real event or this phone's saved name.
+const TOUR = params.has('demo') || location.hash === '#demo';
+const store = TOUR ? new LocalStore({ memory: true })
+  : FIREBASE_CONFIG ? new FirebaseStore(FIREBASE_CONFIG) : new LocalStore();
 
 const S = {
   code: null, uid: null, me: null, meta: null, isOwner: false, metaSig: null, fitted: false,
@@ -33,20 +39,26 @@ const S = {
 };
 
 // ---------- map ----------
-const view = prefs.get('view');
-const map = L.map('map', { zoomControl: false, renderer: L.canvas({ tolerance: 10 }) })
+const view = TOUR ? null : prefs.get('view');
+const map = L.map('map', { zoomControl: false, zoomSnap: TOUR ? 0.25 : 1, renderer: L.canvas({ tolerance: 10 }) })
   .setView(view ? view.c : [37.978, -122.031], view ? view.z : 15);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-}).addTo(map);
+if (TOUR) {
+  document.documentElement.classList.add('tour');
+  map.attributionControl.addAttribution('Pretend neighbourhood for the demo');
+} else {
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+}
 L.control.zoom({ position: 'bottomright' }).addTo(map);
+const baseLayer = L.layerGroup().addTo(map); // demo only: pretend houses and street names
 const areaLayer = L.layerGroup().addTo(map);
 const streetLayer = L.layerGroup().addTo(map);
 const trailLayer = L.layerGroup().addTo(map);
 const peopleLayer = L.layerGroup().addTo(map);
 window.doorHangerMap = map; // handy for debugging from the browser console
-map.on('moveend', () => prefs.set('view', { c: [map.getCenter().lat, map.getCenter().lng], z: map.getZoom() }));
+map.on('moveend', () => !TOUR && prefs.set('view', { c: [map.getCenter().lat, map.getCenter().lng], z: map.getZoom() }));
 
 // ---------- messages ----------
 let bannerTimer = null;
@@ -275,6 +287,7 @@ async function keepAwake() {
 }
 
 function setTrackUi() {
+  if (TOUR) { $('trackBtn').textContent = tour.finished ? 'Watch again' : 'Start door hangers'; return; }
   $('trackBtn').textContent = S.tracking ? 'Stop' : prefs.get('tracking') === S.code ? 'Resume door hangers' : 'Start door hangers';
   $('trackBtn').classList.toggle('stop', S.tracking);
   if (!S.tracking) $('gps').textContent = '';
@@ -342,7 +355,14 @@ function onGeoError(err) {
   }
 }
 
-$('trackBtn').onclick = () => (S.tracking ? stopTracking() : startTracking());
+$('trackBtn').onclick = () => {
+  if (TOUR) {
+    if (tour.finished) location.reload();
+    else banner('In a real event, this starts your own GPS trail and keeps your screen on. In the demo, the pretend adults do the walking.', 8000);
+    return;
+  }
+  if (S.tracking) stopTracking(); else startTracking();
+};
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && S.tracking && (!S.wake || S.wake.released)) keepAwake();
 });
@@ -364,6 +384,11 @@ function endDrawing() {
   $('areaBar').hidden = true;
 }
 $('setAreaBtn').onclick = () => {
+  if (TOUR) {
+    banner('In a real event, the organizer taps the corners of the neighbourhood here, and the app gets its streets from OpenStreetMap.', 9000);
+    closeMenu();
+    return;
+  }
   closeMenu();
   S.drawing = [];
   $('areaBar').hidden = false;
@@ -403,6 +428,11 @@ function saveArea(area, streets) {
 }
 
 $('deleteBtn').onclick = () => {
+  if (TOUR) {
+    banner('In a real event, this deletes everyone\'s trails for good when the day is done.', 7000);
+    closeMenu();
+    return;
+  }
   if (!confirm('Delete this event, its area and everyone\'s trails for good?')) return;
   if (S.tracking) stopTracking();
   store.deleteEvent();
@@ -466,7 +496,9 @@ async function simulate() {
 $('simBtn').onclick = simulate;
 
 // ---------- share ----------
-function shareLink() { return `${location.origin}${location.pathname}?e=${encodeURIComponent(S.code)}`; }
+function shareLink() {
+  return TOUR ? `${location.origin}${location.pathname}?demo` : `${location.origin}${location.pathname}?e=${encodeURIComponent(S.code)}`;
+}
 $('shareBtn').onclick = async () => {
   const url = shareLink();
   try {
@@ -495,6 +527,7 @@ function fillJoin(code) {
   $('joinCode').value = code || '';
   $('joinName').value = me.name || '';
   $('joinGroup').replaceChildren(...GROUPS.map(([name]) => new Option(name, name, false, name === me.group)));
+  $('demoLink').href = `${location.pathname}?demo`;
   $('modeNote').textContent = store.kind === 'demo'
     ? 'Demo mode: no shared database is set up yet, so the map lives in this browser only. See README.md to connect Firebase.'
     : '';
@@ -538,7 +571,8 @@ const handlers = {
     document.title = m.name || 'BSA Troop 444';
     S.isOwner = m.owner === S.uid;
     $('ownerTools').hidden = !S.isOwner;
-    $('simBtn').hidden = store.kind !== 'demo';
+    $('simBtn').hidden = store.kind !== 'demo' || TOUR;
+    $('replayBtn').hidden = !TOUR;
     const sig = (m.area || '') + '|' + JSON.stringify(m.streets || null).length;
     if (sig !== S.metaSig) { S.metaSig = sig; rebuildCoverage(); }
     scheduleRefresh();
@@ -557,22 +591,101 @@ const handlers = {
 async function enter(code, me, createName) {
   S.code = code;
   S.me = me;
-  prefs.set('me', me);
-  prefs.set('code', code);
-  history.replaceState(null, '', `${location.pathname}?e=${encodeURIComponent(code)}`);
+  if (!TOUR) {
+    prefs.set('me', me);
+    prefs.set('code', code);
+    history.replaceState(null, '', `${location.pathname}?e=${encodeURIComponent(code)}`);
+  }
   $('join').hidden = true;
   $('shareLink').value = shareLink();
-  $('youLine').textContent = `${me.name}, ${me.group} group`;
+  $('youLine').textContent = TOUR ? 'You are watching the demo. Nothing here is saved.' : `${me.name}, ${me.group} group`;
+  $('leaveBtn').hidden = TOUR;
   store.watch(code, handlers);
   if (createName) await store.setMeta({ name: createName, owner: S.uid, createdAt: Date.now() });
-  try {
-    await store.updatePerson(S.uid, { ...me, active: false, t: (S.people[S.uid] && S.people[S.uid].t) || Date.now() });
-  } catch { /* event missing: the meta handler explains */ }
+  if (!TOUR) {
+    try {
+      await store.updatePerson(S.uid, { ...me, active: false, t: (S.people[S.uid] && S.people[S.uid].t) || Date.now() });
+    } catch { /* event missing: the meta handler explains */ }
+  }
   setTrackUi();
-  if (prefs.get('tracking') === code) banner('Your trail stopped when this page reloaded. Tap Resume to carry on.');
+  if (!TOUR && prefs.get('tracking') === code) banner('Your trail stopped when this page reloaded. Tap Resume to carry on.');
   drawQr();
-  if (createName) openMenu('event');
+  if (createName && !TOUR) openMenu('event');
 }
+
+// ---------- guided demo ----------
+const tour = { finished: false };
+const tourClock = (i) => {
+  // Each recorded point is ~8 m; at door-hanger pace (~0.45 m/s) that is
+  // about 18 s of the pretend morning, which starts at 9:00 am.
+  const m = 9 * 60 + Math.floor((i * 18) / 60);
+  const h = Math.floor(m / 60);
+  return `${((h + 11) % 12) + 1}:${String(m % 60).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
+};
+
+function drawTourBase(T) {
+  const css = getComputedStyle(document.documentElement);
+  const house = css.getPropertyValue('--house').trim() || '#c9cfc8';
+  for (const h of T.houses) L.polygon(h, { stroke: false, fillColor: house, fillOpacity: 1, interactive: false }).addTo(baseLayer);
+  for (const lb of T.labels) {
+    baseLayer.addLayer(L.tooltip({ permanent: true, direction: 'center', className: 'street-label' + (lb.vertical ? ' vertical' : ''), interactive: false })
+      .setLatLng(lb.ll).setContent(esc(lb.name)));
+  }
+  tour.meet = L.circleMarker(T.meet, { radius: 6, color: '#fff', weight: 2, fillColor: '#3e5383', fillOpacity: 1, interactive: false })
+    .bindTooltip('Meeting spot', { permanent: true, direction: 'bottom', offset: [0, 6], className: 'who-label' })
+    .addTo(baseLayer);
+  const showLabels = () => map.getContainer().classList.toggle('labels-off', map.getZoom() < 15.75);
+  map.on('zoomend', showLabels);
+  showLabels();
+}
+
+async function runTour() {
+  const T = makeTour();
+  await enter('demo', { name: 'You', group: 'Red', color: '#d93025' }, 'Demo: Saturday door hangers');
+  drawTourBase(T);
+  await saveArea(T.area, T.streets);
+  const walkers = T.walkers.map((w) => ({ ...w, run: 1, locked: false, out: true }));
+  walkers.forEach((w) => store.updatePerson(w.uid, {
+    name: w.name, group: w.group, color: w.color, active: true, t: Date.now(), lat: T.meet[0], lng: T.meet[1],
+  }));
+  banner('This is a demo: four pretend adults hang door hangers on a pretend neighbourhood, sped up. Watch the streets turn green.', 12000);
+  let i = 0;
+  const tick = () => {
+    let out = 0;
+    for (const w of walkers) {
+      const s = w.samples[i];
+      if (!s) {
+        if (w.out) { w.out = false; store.updatePerson(w.uid, { active: false, t: Date.now() }); }
+        continue;
+      }
+      out++;
+      if (s.gap) {
+        if (!w.locked) {
+          w.locked = true;
+          banner(`${w.name}'s phone locked for a few minutes, so part of a street was missed. It will show up in Streets left.`, 9000);
+        }
+        continue; // a locked phone sends nothing
+      }
+      if (w.locked) { w.locked = false; w.run++; } // a new trail line after the gap
+      const t = Date.now();
+      store.addPoint(w.uid, { lat: s.ll[0], lng: s.ll[1], t, a: 6, r: w.run });
+      store.updatePerson(w.uid, { lat: s.ll[0], lng: s.ll[1], t, active: true });
+    }
+    if (i === 16) tour.meet.unbindTooltip(); // everyone has set off; free up the space for their names
+    if (i === 60) banner('Tap Menu to see who is out and which streets are left.', 8000);
+    $('gps').textContent = out ? `Demo · pretend clock ${tourClock(i)} · ${out} adults walking` : 'Demo finished';
+    i++;
+    if (out) return;
+    clearInterval(S.sim);
+    S.sim = null;
+    tour.finished = true;
+    setTrackUi();
+    const pct = S.cov ? Math.round(S.cov.stats().pct * 100) : 0;
+    banner(`Done by ${tourClock(i)}: ${pct}% of streets covered. Menu > Streets left shows the two that were missed. Tap a grey street on the map to mark it done by hand.`);
+  };
+  S.sim = setInterval(tick, 250);
+}
+$('replayBtn').onclick = () => location.reload();
 
 setInterval(() => {
   for (const [uid, p] of Object.entries(S.people)) if (uid !== S.uid || !S.tracking) drawPerson(uid, p);
@@ -587,7 +700,7 @@ setInterval(() => {
     joinError('Could not connect to the shared database: ' + err.message);
     return;
   }
-  const params = new URLSearchParams(location.search);
+  if (TOUR) { runTour(); return; }
   const code = (params.get('e') || prefs.get('code') || '').trim().toLowerCase();
   const me = prefs.get('me');
   if (code && me && me.name && !params.has('edit')) enter(code, me);

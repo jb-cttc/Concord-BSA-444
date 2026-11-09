@@ -120,6 +120,31 @@ Use a Google account that belongs to the troop (or to you).
 - Track only adults' phones and use adults' names. Scouts' names and positions
   never go in. Delete the event when the day is done.
 
+## Showing it to people: the one-minute demo
+
+Add `?demo` to the address, or tap **New here? Watch a one-minute demo** on the
+join screen:
+
+`https://jb-cttc.github.io/Concord-BSA-444/door-hanger-map/?demo`
+(once GitHub Pages is turned on)
+
+It needs no event, no name and no location permission. Four pretend adults
+leave a meeting spot and walk a pretend neighbourhood of about 370 houses,
+sped up to about a minute. Streets turn green as they go. Along the way:
+
+- One phone "locks" partway down Wren Way, so part of that street is missed.
+- Nobody gets to Quail Ct.
+- At the end, **Menu > Streets left** lists those two. Tapping a grey street
+  marks it done by hand.
+
+The menus, the share link and QR code, and the organizer buttons all work or
+explain what they would do in a real event. Nothing is saved: closing the page
+ends the demo, and the phone's own name and events are untouched.
+
+The pretend neighbourhood is made up, so the demo shows no real street, home
+or trail. It is drawn without map tiles, so it also runs where the map can't
+load.
+
 ## Trying it without Firebase (demo mode)
 
 With `FIREBASE_CONFIG = null` in `config.js`, the app runs in demo mode. Data
@@ -129,6 +154,7 @@ stays in that one browser, though it is shared between its tabs.
 cd door-hanger-map
 python3 -m http.server 8080     # then open http://localhost:8080
 node check-coverage.js          # coverage math checks
+node check-demo.js              # the guided demo tells the story it promises
 ```
 
 Create an event, then on the Event tab tap **Simulate 3 walkers (demo)**. If no
@@ -143,6 +169,7 @@ fake adults then walk it. Open the event link in a second tab and press
 | `index.html`, `style.css` | The page: map, top and bottom bars, join screen, menu |
 | `app.js` | Joining, GPS tracking, drawing people, trails and streets, organizer tools |
 | `coverage.js` | Street pieces and coverage maths (no browser code; tested by `check-coverage.js`) |
+| `demo.js` | The guided demo's pretend neighbourhood and walkers (no browser code; tested by `check-demo.js`) |
 | `store.js` | Shared data: `FirebaseStore` (live) and `LocalStore` (demo) |
 | `config.js` | Firebase settings, or `null` for demo mode |
 | `firebase-rules.json` | Database security rules to paste into Firebase |
