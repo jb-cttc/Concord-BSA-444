@@ -1,0 +1,10 @@
+{
+  "name": "door-hanger-map",
+  "private": true,
+  "type": "module",
+  "description": "Shared live map for a scout troop's door-hanger day",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node check-coverage.js"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "events": {
+      "$event": {
+        ".read": "auth != null",
+        ".write": "auth != null && data.child('meta/owner').val() === auth.uid",
+        "meta": {
+          ".write": "auth != null && (!data.exists() || data.child('owner').val() === auth.uid)",
+          ".validate": "newData.child('owner').val() === auth.uid || data.child('owner').val() === auth.uid"
+        },
+        "people": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('events').child($event).child('meta').exists()"
+          }
+        },
+        "tracks": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('events').child($event).child('meta').exists()",
+            "$point": {
+              ".validate": "newData.hasChildren(['lat', 'lng', 't']) && newData.child('lat').isNumber() && newData.child('lng').isNumber()"
+            }
+          }
+        },
+        "done": {
+          "$way": {
+            ".write": "auth != null && root.child('events').child($event).child('meta').exists()"
+          }
+        }
+      }
+    }
+  }
+}
